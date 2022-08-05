@@ -45,6 +45,7 @@ String TEROS11::begin(time_t time, bool &criticalFault, bool &fault)
 
 String TEROS11::selfDiagnostic(uint8_t diagnosticLevel, time_t time)
 {
+	if(getSensorPort() == 0) throwError(FIND_FAIL); //If no port found, report failure
 	String output = "{\"METER Soil\":{";
 	if(diagnosticLevel == 0) {
 		//TBD
@@ -102,7 +103,7 @@ String TEROS11::selfDiagnostic(uint8_t diagnosticLevel, time_t time)
 		output = output + "}"; //Close pair
 		
 	}
-	return output + ",\"Pos\":[" + getTalonPort() + "," + getSensorPort() + "]}}"; //Write position in logical form - Return compleated closed output
+	return output + ",\"Pos\":[" + getTalonPortString() + "," + getSensorPortString() + "]}}"; //Write position in logical form - Return compleated closed output
 }
 
 String TEROS11::getMetadata()
@@ -375,7 +376,8 @@ String TEROS11::getErrors()
 	// 	}
 	// 	return 0; //Return success indication
 	// }
-	String output = "{\"Apogee Pyro\":{"; // OPEN JSON BLOB
+	// if(getSensorPort() == 0) throwError(FIND_FAIL); //If no port found, report failure
+	String output = "{\"METER Soil\":{"; // OPEN JSON BLOB
 	output = output + "\"CODES\":["; //Open codes pair
 
 	for(int i = 0; i < min(MAX_NUM_ERRORS, numErrors); i++) { //Interate over used element of array without exceeding bounds
