@@ -3,33 +3,30 @@
 
 // #include "DPS368-Library-Arduino/src/Dps368.h"
 // #include "Adafruit_SHT31/src/Adafruit_SHT31.h"
-#include <Sensor.h>
-#include <SDI12Talon.h>
+#include <SDI12TalonSensor.h>
 
-class TEROS11: public Sensor
+class TEROS11 final: public SDI12TalonSensor
 {
-	constexpr static int DEAFULT_PORT = 2; ///<Use port 2 by default
-	constexpr static int DEFAULT_SENSOR_PORT = 0; ///<Use port 0 by default
-  	constexpr static int DEFAULT_VERSION = 0x00; ///<Use hardware version unknown by default
 	const String FIRMWARE_VERSION = "0.0.0"; //FIX! Read from system??
   	// constexpr static int MAX_NUM_ERRORS = 10; ///<Maximum number of errors to log before overwriting previous errors in buffer
 
 	// const uint32_t SENSOR_PORT_RANGE_ERROR = 0x90010100; //FIX! 
 	// const uint32_t TALON_PORT_RANGE_ERROR = 0x90010200; //FIX! 
-	const uint32_t DPS368_READ_ERROR = 0x80010000; //FIX! Error subtype = 1 for temp read, subtype = 2 for pres
-	const uint32_t SHT3X_NAN_ERROR = 0x10040000; //FIX! Error subtype = 1 for temp read, subtype = 2 for RH
-	const uint32_t DPS368_INIT_ERROR = 0x10010000; //FIX! Error subtype = I2C error code
-	const uint32_t SHT3X_INIT_ERROR = 0x10030000; //FIX! 
-	const uint32_t SHT3X_I2C_ERROR = 0x10020000; //FIX! Error subtype = I2C error code
+	constexpr static uint32_t DPS368_READ_ERROR = 0x80010000; //FIX! Error subtype = 1 for temp read, subtype = 2 for pres
+	constexpr static uint32_t SHT3X_NAN_ERROR = 0x10040000; //FIX! Error subtype = 1 for temp read, subtype = 2 for RH
+	constexpr static uint32_t DPS368_INIT_ERROR = 0x10010000; //FIX! Error subtype = I2C error code
+	constexpr static uint32_t SHT3X_INIT_ERROR = 0x10030000; //FIX!
+	constexpr static uint32_t SHT3X_I2C_ERROR = 0x10020000; //FIX! Error subtype = I2C error code
 
 	public:
-		TEROS11(SDI12Talon& talon_, uint8_t talonPort_ = DEAFULT_PORT, uint8_t sensorPort_ = DEFAULT_SENSOR_PORT, uint8_t version = DEFAULT_VERSION);
+		TEROS11(SDI12Talon& talon_, uint8_t sensorPort_);
 		String begin(time_t time, bool &criticalFault, bool &fault);
 		String getData(time_t time);
 		String selfDiagnostic(uint8_t diagnosticLevel = 4, time_t time = 0); //Default to just level 4 diagnostic, default to time = 0
-		String getMetadata();
 		String getErrors();
-		bool isPresent();
+		const char* name() override { return "METER Soil"; }
+		const char* firmwareVersion() override { return FIRMWARE_VERSION; }
+		static bool isPresent(SDI12Talon& talon, uint8_t port);
 		// uint8_t getTalonPort() {
 		// 	if(talonPort < 255) return talonPort + 1;
 		// 	else return 0;
@@ -50,7 +47,6 @@ class TEROS11: public Sensor
 	private:
 		// Dps368 presSensor = Dps368();
 		// Adafruit_SHT31 rhSensor = Adafruit_SHT31();
-		SDI12Talon& talon;
 		int indexOfSep(String input);
 		// uint8_t port = 0;
 		// int throwError(uint32_t error);
