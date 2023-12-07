@@ -1,3 +1,5 @@
+//© 2023 Regents of the University of Minnesota. All rights reserved.
+
 #ifndef TEROS11_h
 #define TEROS11_h
 
